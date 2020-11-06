@@ -1,40 +1,49 @@
-# Define variable
-# DEF X: INTEGER
-# DEF P: BOOLEAN
+from typing import Dict
 
-# Instantiate variable
-# LET X = 100
-# LET P = TRUE
-
-# Set variable to result
-# LET X = Y + 20
-# LET P = X > 20
-
-# Integer operators: +, -, negation
-# Boolean operators: AND, OR, NOT
-# Comparators: <, <=, ==, >=, >
-
-# Blocks: { statements }
-# Selection
-# IF (predicate) block
-# IF (predicate) block ELSE block
-# Iteration: WHILE (predicate) block
-
-class Block:
-    pass
+from math_set import Set, RangeSet, Union, Intersection, Difference, Complement, UniversalSet, EmptySet
 
 
-class If:
-    pass
+class State:
+    def __init__(self, state: Dict[str, Set]):
+        self.state = state
+
+    def add_variable(self, name, value):
+        self.state[name] = value
+
+    def compare_to(self, other):
+        for k, v in self.state.items():
+            cmp = v.compare(other[k])
+            if cmp == -2:
+                return -2
+            elif cmp == 1:
+                return -2
+            elif cmp == 2:
+                return 2
+        else:
+            return -1
+
+    def minimum(self, other):
+        min_state = {}
+        for k, v in self.state.items():
+            min_state[k] = v.intersection(other[k])
+        return min_state
+
+    def maximum(self, other):
+        max_state = {}
+        for k, v in other.items():
+            max_state[k] = v.union(self.state[k])
+        return max_state
 
 
-class While:
-    pass
+if __name__ == '__main__':
+    state1 = {'a': RangeSet(1, 1), 'b': RangeSet(1, 3), 'c': RangeSet(3, 3)}
+    state2 = {'a': RangeSet(1, 3), 'b': RangeSet(1, 3), 'c': RangeSet(1, 3), 'd': RangeSet(3, 3)}
 
+    pre_state = State(state1)
+    post_state = State(state2)
 
-class Def:
-    pass
+    res1 = pre_state.compare_to(post_state.state)
+    res2 = post_state.compare_to(pre_state.state)
 
-
-class Let:
-    pass
+    print(f'res1 {res1}')
+    print(f'res2 {res2}')
